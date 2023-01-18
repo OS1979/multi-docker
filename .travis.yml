@@ -1,6 +1,15 @@
 sudo: required
 language: generic
 
+env:
+  
+  
+  - AWS_REGION=eu-central-1
+  - APP_CLIENT=multi-client
+  - APP_NGINX=multi-nginx
+  - APP_SERVER=multi-server
+  - APP_WORKER=multi-worker
+
 services:
   - docker
 
@@ -11,15 +20,31 @@ script:
   - docker run -e CI=true stadom/react-test npm test
 
 after_success:
-  - docker build -t stadom/multi-client ./client
+  - docker build -t stadom/ ./client
   - docker build -t stadom/multi-nginx ./nginx
   - docker build -t stadom/multi-server ./server
   - docker build -t stadom/multi-worker ./worker
   # Log in to the docker CLI
-  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
-  # Take those images and push them to docker hub
-  - docker push stadom/multi-client
-  - docker push stadom/multi-nginx
-  - docker push stadom/multi-server
-  - docker push stadom/multi-worker
-  - echo "The End of push!"
+  
+  - docker --version  # document the version travis is using
+  - pip install --user awscli # install aws cli w/o sudo
+  - export PATH=$PATH:$HOME/.local/bin # put aws in the path
+  - TIMESTAMP=$(date '+%Y%m%d%H%M%S')
+  # using datetime as part of a version for versioned image
+  - TRAVIS_BUILD_ID="${TIMESTAMP}-${TRAVIS_COMMIT}"
+  #- export "$AWS_ACCESS_KEY_ID"
+  #- export "$AWS_SECRET_ACCESS_KEY"
+
+  - export AWS_ECR_ACCOUNT="$( aws sts get-caller-identity --output text --query 'Account' )"
+  - REGISTRY_URL=${AWS_ECR_ACCOUNT}.dkr.ecr.${AWS_REGION}.amazonaws.com
+  - eval $(aws ecr get-login --no-include-email --region $AWS_REGION) #needs AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY envvars
+  - docker build -t $AWS_ECR_ACCOUNT.dkr.ecr.$AWS_REGION.amazonaws.com/$APP_CLIENT:$TRAVIS_BUILD_ID ./client
+  - docker build -t $AWS_ECR_ACCOUNT.dkr.ecr.$AWS_REGION.amazonaws.com/$APP_NGINX:$TRAVIS_BUILD_ID ./client
+  - docker build -t $AWS_ECR_ACCOUNT.dkr.ecr.$AWS_REGION.amazonaws.com/$APP_SERVER:$TRAVIS_BUILD_ID ./client
+  - docker build -t $AWS_ECR_ACCOUNT.dkr.ecr.$AWS_REGION.amazonaws.com/$APP_WORKER:$TRAVIS_BUILD_ID ./client
+
+  - docker push $AWS_ECR_ACCOUNT.dkr.ecr.$AWS_REGION.amazonaws.com/$APP_CLIENT:$TRAVIS_BUILD_ID ./client
+  - docker push $AWS_ECR_ACCOUNT.dkr.ecr.$AWS_REGION.amazonaws.com/$APP_NGINX:$TRAVIS_BUILD_ID ./client
+  - docker push $AWS_ECR_ACCOUNT.dkr.ecr.$AWS_REGION.amazonaws.com/$APP_SERVER:$TRAVIS_BUILD_ID ./client
+  - docker push $AWS_ECR_ACCOUNT.dkr.ecr.$AWS_REGION.amazonaws.com/$APP_WORKER:$TRAVIS_BUILD_ID ./client
+  - echo "The  End of push!"
