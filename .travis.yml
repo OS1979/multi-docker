@@ -4,11 +4,11 @@ language: generic
 env:
   
   
-  - AWS_REGION=eu-central-1
-  - APP_CLIENT=multi-client
-  - APP_NGINX=multi-nginx
-  - APP_SERVER=multi-server
-  - APP_WORKER=multi-worker
+  - AWS_REGION=eu-central-1 - APP_CLIENT=multi-client - APP_NGINX=multi-nginx - APP_SERVER=multi-server - APP_WORKER=multi-worker
+  #- APP_CLIENT=multi-client
+  #- APP_NGINX=multi-nginx
+  #- APP_SERVER=multi-server
+  #- APP_WORKER=multi-worker
 
 services:
   - docker
