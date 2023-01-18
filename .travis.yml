@@ -41,3 +41,4 @@ after_success:
   - docker push $AWS_ECR_ACCOUNT.dkr.ecr.$AWS_REGION.amazonaws.com/$APP_SERVER:$TRAVIS_BUILD_ID
   - docker push $AWS_ECR_ACCOUNT.dkr.ecr.$AWS_REGION.amazonaws.com/$APP_WORKER:$TRAVIS_BUILD_ID
   - echo "The  End of push!"
+
