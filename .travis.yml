@@ -22,3 +22,4 @@ after_success:
   - docker push stadom/multi-nginx
   - docker push stadom/multi-server
   - docker push stadom/multi-worker
+  - echo "The End of push!"
