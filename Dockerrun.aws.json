@@ -3,7 +3,7 @@
     "ContainerDefinition": [
       {
         "name": "client",
-        "image": "817076261729.dkr.ecr.eu-central-1.amazonaws.com/multi-client/multi-client",
+        "image": "817076261729.dkr.ecr.eu-central-1.amazonaws.com/multi-client/multi-client:latest",
         "hostname": "client",
         "essential": false,
         "memory": 128
@@ -11,7 +11,7 @@
 
       {
         "name": "server",
-        "image": "817076261729.dkr.ecr.eu-central-1.amazonaws.com/multi-server/multi-server",
+        "image": "817076261729.dkr.ecr.eu-central-1.amazonaws.com/multi-server/multi-server:latest",
         "hostname": "api",
         "essential": false,
         "memory": 128
@@ -19,7 +19,7 @@
 
       {
         "name": "worker",
-        "image": "817076261729.dkr.ecr.eu-central-1.amazonaws.com/multi-worker/multi-worker",
+        "image": "817076261729.dkr.ecr.eu-central-1.amazonaws.com/multi-worker/multi-worker:latest",
         "hostname": "worker",
         "essential": false,
         "memory": 128
@@ -27,7 +27,7 @@
 
       {
         "name": "nginx",
-        "image": "817076261729.dkr.ecr.eu-central-1.amazonaws.com/multi-nginx/multi-nginx",
+        "image": "817076261729.dkr.ecr.eu-central-1.amazonaws.com/multi-nginx/multi-nginx:latest",
         "hostname": "nginx",
         "essential": true,
         "portMappings": [
