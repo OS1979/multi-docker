@@ -32,20 +32,22 @@ after_success:
   - REGISTRY_URL=${AWS_ECR_ACCOUNT}.dkr.ecr.${AWS_REGION}.amazonaws.com
   - echo $REGISTRY_URL
   - eval $(aws ecr get-login --no-include-email --region $AWS_REGION) #needs AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY envvars
+   - eval $(aws ecr get-login-password --region eu-central-1 | docker login --username AWS --password-stdin 817076261729.dkr.ecr.eu-central-1.amazonaws.com)
+ 
   #- docker build -t $AWS_ECR_ACCOUNT.dkr.ecr.$AWS_REGION.amazonaws.com/$APP_CLIENT:$TRAVIS_BUILD_ID ./client
   #- docker build -t $AWS_ECR_ACCOUNT.dkr.ecr.$AWS_REGION.amazonaws.com/$APP_NGINX:$TRAVIS_BUILD_ID ./nginx
   #- docker build -t $AWS_ECR_ACCOUNT.dkr.ecr.$AWS_REGION.amazonaws.com/$APP_SERVER:$TRAVIS_BUILD_ID ./server
   #- docker build -t $AWS_ECR_ACCOUNT.dkr.ecr.$AWS_REGION.amazonaws.com/$APP_WORKER:$TRAVIS_BUILD_ID ./worker
 
-  - docker build -t $AWS_ECR_ACCOUNT.dkr.ecr.$AWS_REGION.amazonaws.com/$APP_CLIENT:$APP_CLIENT ./client
-  - docker build -t $AWS_ECR_ACCOUNT.dkr.ecr.$AWS_REGION.amazonaws.com/$APP_NGINX:$APP_NGINX ./nginx
-  - docker build -t $AWS_ECR_ACCOUNT.dkr.ecr.$AWS_REGION.amazonaws.com/$APP_SERVER:$APP_SERVER ./server
-  - docker build -t $AWS_ECR_ACCOUNT.dkr.ecr.$AWS_REGION.amazonaws.com/$APP_WORKER:$APP_WORKER ./worker
+  - docker build -t $AWS_ECR_ACCOUNT.dkr.ecr.$AWS_REGION.amazonaws.com/$APP_CLIENT:latest ./client
+  - docker build -t $AWS_ECR_ACCOUNT.dkr.ecr.$AWS_REGION.amazonaws.com/$APP_NGINX:latest ./nginx
+  - docker build -t $AWS_ECR_ACCOUNT.dkr.ecr.$AWS_REGION.amazonaws.com/$APP_SERVER:latest ./server
+  - docker build -t $AWS_ECR_ACCOUNT.dkr.ecr.$AWS_REGION.amazonaws.com/$APP_WORKER:latest ./worker
 
-  - docker push $AWS_ECR_ACCOUNT.dkr.ecr.$AWS_REGION.amazonaws.com/$APP_CLIENT:$APP_CLIENT
-  - docker push $AWS_ECR_ACCOUNT.dkr.ecr.$AWS_REGION.amazonaws.com/$APP_NGINX:$APP_NGINX
-  - docker push $AWS_ECR_ACCOUNT.dkr.ecr.$AWS_REGION.amazonaws.com/$APP_SERVER:$APP_SERVER
-  - docker push $AWS_ECR_ACCOUNT.dkr.ecr.$AWS_REGION.amazonaws.com/$APP_WORKER:$APP_WORKER
+  - docker push $AWS_ECR_ACCOUNT.dkr.ecr.$AWS_REGION.amazonaws.com/$APP_CLIENT:latest
+  - docker push $AWS_ECR_ACCOUNT.dkr.ecr.$AWS_REGION.amazonaws.com/$APP_NGINX:latest
+  - docker push $AWS_ECR_ACCOUNT.dkr.ecr.$AWS_REGION.amazonaws.com/$APP_SERVER:latest
+  - docker push $AWS_ECR_ACCOUNT.dkr.ecr.$AWS_REGION.amazonaws.com/$APP_WORKER:latest
   - echo "The  End of push!"
 
 deploy:
