@@ -50,6 +50,8 @@ after_success:
 
 deploy:
   provider: elasticbeanstalk
+  access_key_id: $AWS_ACCESS_KEY
+  secret_access_key: $AWS_SECRET_KEY
   region: 'eu-central-1'
   app: 'app-docker-multir'
   env: 'Appdockermulti-env'
@@ -57,5 +59,4 @@ deploy:
   bucket_path: 'docker-multi'
   on:
     branch: main
-  access_key_id: $AWS_ACCESS_KEY
-  secret_access_key: $AWS_SECRET_KEY
+  
