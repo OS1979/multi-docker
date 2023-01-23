@@ -3,11 +3,11 @@ run-name: ${{ github.actor }} is CICD pipeline from GitHub Actions AWS EB
 env:
   AWS_SECRET_ACCESS_KEY: "${{ secrets.AWS_SECRET_ACCESS_KEY}}"
   AWS_ACCESS_KEY_ID    : "${{ secrets.AWS_ACCESS_KEY_ID}}"
-  PACKAGE_NAME         : "nodejs_app_${{ github.sha }}.zip"
-  EB_APP_NAME          : "app_nodejs"
-  EB_ENV_NAME          : "env-dev"
-  EB_S3_NAME           : "githubaction-to-beanstalk"
-  AWS_REGION           : "eu-central-1"
+  APP_CLIENT: multi-client
+  APP_NGINX: multi-nginx
+  APP_SERVER: multi-server
+  APP_WORKER: multi-worker
+  AWS_REGION: "eu-central-1"
 
   
 on:
@@ -29,27 +29,58 @@ jobs:
     steps:
     
     - uses: actions/checkout@v3  
-    - name: Generate deployment package
-      run: docker --version  # document the version travis is using
-    - run: pip install --user awscli # install aws cli w/o sudo
-    - run: export PATH=$PATH:$HOME/.local/bin # put aws in the path
-    - run: TIMESTAMP=$(date '+%Y%m%d%H%M%S')
-  # using datetime as part of a version for versioned image .
-    - run : export AWS_ECR_ACCOUNT="$( aws sts get-caller-identity --output text --query 'Account' )"
-    - run : REGISTRY_URL=${AWS_ECR_ACCOUNT}.dkr.ecr.${AWS_REGION}.amazonaws.com
-    - run : echo $REGISTRY_URL
-    - run : eval $(aws ecr get-login --no-include-email --region $AWS_REGION) #needs AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY envvars!
-    - run : eval $(aws ecr get-login-password --region eu-central-1) 
-      
-    - run : docker build -t $AWS_ECR_ACCOUNT.dkr.ecr.$AWS_REGION.amazonaws.com/$APP_CLIENT:latest ./client
-    - run : docker build -t $AWS_ECR_ACCOUNT.dkr.ecr.$AWS_REGION.amazonaws.com/$APP_NGINX:latest ./nginx
-    - run : docker build -t $AWS_ECR_ACCOUNT.dkr.ecr.$AWS_REGION.amazonaws.com/$APP_SERVER:latest ./server
-    - run : docker build -t $AWS_ECR_ACCOUNT.dkr.ecr.$AWS_REGION.amazonaws.com/$APP_WORKER:latest ./worker
 
-    - run : docker push $AWS_ECR_ACCOUNT.dkr.ecr.$AWS_REGION.amazonaws.com/$APP_CLIENT:latest
-    - run : docker push $AWS_ECR_ACCOUNT.dkr.ecr.$AWS_REGION.amazonaws.com/$APP_NGINX:latest
-    - run : docker push $AWS_ECR_ACCOUNT.dkr.ecr.$AWS_REGION.amazonaws.com/$APP_SERVER:latest
-    - run : docker push $AWS_ECR_ACCOUNT.dkr.ecr.$AWS_REGION.amazonaws.com/$APP_WORKER:latest
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ env.AWS_REGION }} 
+
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v1
+
+    - name: Build, tag, and push docker image to Amazon ECR
+      env:
+        REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        REPOSITORY_CLIENT: ${{ env.APP_CLIENT }}
+        REPOSITORY_NGINX: ${{ env.APP_NGINX }}
+        REPOSITORY_SERVER: ${{ env.APP_SERVER }}
+        REPOSITORY_WORKER: ${{ env.APP_WORKER }}
+        IMAGE_TAG: ${{ github.sha }}
+      run: |
+        docker build -t $REGISTRY/$REPOSITORY_CLIENT:latest ./client
+        docker build -t $REGISTRY/$REPOSITORY_NGINX:latest ./nginx
+        docker build -t $REGISTRY/$REPOSITORY_SERVER:latest ./server
+        docker build -t $REGISTRY/$REPOSITORY_WORKER:latest ./worker
+
+        docker push $REGISTRY/$REPOSITORY_CLIENT:latest
+        docker push $REGISTRY/$REPOSITORY_NGINX:latest
+        docker push $REGISTRY/$REPOSITORY_SERVER:latest
+        docker push $REGISTRY/$REPOSITORY_WORKER:latest
+
+    ##- name: Generate deployment package
+    ##  run: docker --version  # document the version travis is using
+    ##- run: pip install --user awscli # install aws cli w/o sudo
+    ##- run: export PATH=$PATH:$HOME/.local/bin # put aws in the path
+    ##- run: TIMESTAMP=$(date '+%Y%m%d%H%M%S')
+  # using datetime as part of a version for versioned image
+    ##- run : export AWS_ECR_ACCOUNT="$( aws sts get-caller-identity --output text --query 'Account' )"
+    ##- run : REGISTRY_URL=${AWS_ECR_ACCOUNT}.dkr.ecr.${AWS_REGION}.amazonaws.com
+    ##- run : echo $REGISTRY_URL
+    ##- run : eval $(aws ecr get-login --no-include-email --region $AWS_REGION) #needs AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY envvars!
+    ##- run : eval $(aws ecr get-login-password --region eu-central-1) 
+      
+    #- run : docker build -t $AWS_ECR_ACCOUNT.dkr.ecr.$AWS_REGION.amazonaws.com/$APP_CLIENT:latest ./client
+    #- run : docker build -t $AWS_ECR_ACCOUNT.dkr.ecr.$AWS_REGION.amazonaws.com/$APP_NGINX:latest ./nginx
+    #- run : docker build -t $AWS_ECR_ACCOUNT.dkr.ecr.$AWS_REGION.amazonaws.com/$APP_SERVER:latest ./server
+    #- run : docker build -t $AWS_ECR_ACCOUNT.dkr.ecr.$AWS_REGION.amazonaws.com/$APP_WORKER:latest ./worker
+
+    #- run : docker push $AWS_ECR_ACCOUNT.dkr.ecr.$AWS_REGION.amazonaws.com/$APP_CLIENT:latest
+    #- run : docker push $AWS_ECR_ACCOUNT.dkr.ecr.$AWS_REGION.amazonaws.com/$APP_NGINX:latest
+    #- run : docker push $AWS_ECR_ACCOUNT.dkr.ecr.$AWS_REGION.amazonaws.com/$APP_SERVER:latest
+    #- run : docker push $AWS_ECR_ACCOUNT.dkr.ecr.$AWS_REGION.amazonaws.com/$APP_WORKER:latest
     - run : echo "The  End of push!"
 
     - name: Generate deployment package
@@ -66,4 +97,3 @@ jobs:
           region: eu-central-1
           version_label: ${{ github.sha }}
           deployment_package: deploy-multi.zip
-    
