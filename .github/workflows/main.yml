@@ -39,7 +39,7 @@ jobs:
     - run : REGISTRY_URL=${AWS_ECR_ACCOUNT}.dkr.ecr.${AWS_REGION}.amazonaws.com
     - run : echo $REGISTRY_URL
     - run : eval $(aws ecr get-login --no-include-email --region $AWS_REGION) #needs AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY envvars!
-    - run : eval $(aws ecr get-login-password --region eu-central-1 | docker login --username AWS --password-stdin 817076261729.dkr.ecr.eu-central-1.amazonaws.com) 
+    - run : eval $(aws ecr get-login-password --region eu-central-1) 
       
     - run : docker build -t $AWS_ECR_ACCOUNT.dkr.ecr.$AWS_REGION.amazonaws.com/$APP_CLIENT:latest ./client
     - run : docker build -t $AWS_ECR_ACCOUNT.dkr.ecr.$AWS_REGION.amazonaws.com/$APP_NGINX:latest ./nginx
