@@ -31,7 +31,7 @@ after_success:
   - export AWS_ECR_ACCOUNT="$( aws sts get-caller-identity --output text --query 'Account' )"
   - REGISTRY_URL=${AWS_ECR_ACCOUNT}.dkr.ecr.${AWS_REGION}.amazonaws.com
   - echo $REGISTRY_URL
-  - eval $(aws ecr get-login --no-include-email --region $AWS_REGION) #needs AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY envvars
+  - eval $(aws ecr get-login --no-include-email --region $AWS_REGION) #needs AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY envvars!
   - eval $(aws ecr get-login-password --region eu-central-1 | docker login --username AWS --password-stdin 817076261729.dkr.ecr.eu-central-1.amazonaws.com)
   #- docker build -t $AWS_ECR_ACCOUNT.dkr.ecr.$AWS_REGION.amazonaws.com/$APP_CLIENT:$TRAVIS_BUILD_ID ./client
   #- docker build -t $AWS_ECR_ACCOUNT.dkr.ecr.$AWS_REGION.amazonaws.com/$APP_NGINX:$TRAVIS_BUILD_ID ./nginx
@@ -52,11 +52,11 @@ after_success:
 deploy:
   provider: elasticbeanstalk
   region: 'eu-central-1'
-  app: 'app-docker-multir'
+  app: 'app-docker-multi'
   env: 'Appdockermulti-env'
   bucket_name: 'elasticbeanstalk-eu-central-1-817076261729'
   bucket_path: 'docker-multi'
   on:
     branch: main
-  access_key_id: $AWS_ACCESS_KEY
-  secret_access_key: $AWS_SECRET_KEY
+  access_key_id: $AWS_ACCESS_KEY_ID
+  secret_access_key: $AWS_SECRET_ACCESS_KEY
