@@ -1,9 +1,9 @@
 {
     "AWSEBDockerrunVersion": 2,
-    "ContainerDefinition": [
+    "containerDefinitions": [
       {
         "name": "client",
-        "image": "817076261729.dkr.ecr.eu-central-1.amazonaws.com/multi-client/multi-client:latest",
+        "image": "817076261729.dkr.ecr.eu-central-1.amazonaws.com/multi-client:latest",
         "hostname": "client",
         "essential": false,
         "memory": 128
@@ -11,7 +11,7 @@
 
       {
         "name": "server",
-        "image": "817076261729.dkr.ecr.eu-central-1.amazonaws.com/multi-server/multi-server:latest",
+        "image": "817076261729.dkr.ecr.eu-central-1.amazonaws.com/multi-server:latest",
         "hostname": "api",
         "essential": false,
         "memory": 128
@@ -19,7 +19,7 @@
 
       {
         "name": "worker",
-        "image": "817076261729.dkr.ecr.eu-central-1.amazonaws.com/multi-worker/multi-worker:latest",
+        "image": "817076261729.dkr.ecr.eu-central-1.amazonaws.com/multi-worker:latest",
         "hostname": "worker",
         "essential": false,
         "memory": 128
@@ -27,7 +27,7 @@
 
       {
         "name": "nginx",
-        "image": "817076261729.dkr.ecr.eu-central-1.amazonaws.com/multi-nginx/multi-nginx:latest",
+        "image": "817076261729.dkr.ecr.eu-central-1.amazonaws.com/multi-nginx:latest",
         "hostname": "nginx",
         "essential": true,
         "portMappings": [
