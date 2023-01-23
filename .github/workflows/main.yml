@@ -34,7 +34,7 @@ jobs:
     - run: pip install --user awscli # install aws cli w/o sudo
     - run: export PATH=$PATH:$HOME/.local/bin # put aws in the path
     - run: TIMESTAMP=$(date '+%Y%m%d%H%M%S')
-  # using datetime as part of a version for versioned image
+  # using datetime as part of a version for versioned image .
     - run : export AWS_ECR_ACCOUNT="$( aws sts get-caller-identity --output text --query 'Account' )"
     - run : REGISTRY_URL=${AWS_ECR_ACCOUNT}.dkr.ecr.${AWS_REGION}.amazonaws.com
     - run : echo $REGISTRY_URL
