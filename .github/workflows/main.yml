@@ -30,27 +30,27 @@ jobs:
     
     - uses: actions/checkout@v3  
     - name: Generate deployment package
-      run : docker --version  # document the version travis is using
-      run : pip install --user awscli # install aws cli w/o sudo
-      run : export PATH=$PATH:$HOME/.local/bin # put aws in the path
-      run : TIMESTAMP=$(date '+%Y%m%d%H%M%S')
+      run: docker --version  # document the version travis is using
+    - run: pip install --user awscli # install aws cli w/o sudo
+    - run: export PATH=$PATH:$HOME/.local/bin # put aws in the path
+    - run: TIMESTAMP=$(date '+%Y%m%d%H%M%S')
   # using datetime as part of a version for versioned image
-      run : export AWS_ECR_ACCOUNT="$( aws sts get-caller-identity --output text --query 'Account' )"
-      run : REGISTRY_URL=${AWS_ECR_ACCOUNT}.dkr.ecr.${AWS_REGION}.amazonaws.com
-      run : echo $REGISTRY_URL
-      run : eval $(aws ecr get-login --no-include-email --region $AWS_REGION) #needs AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY envvars!
-      run : eval $(aws ecr get-login-password --region eu-central-1 | docker login --username AWS --password-stdin 817076261729.dkr.ecr.eu-central-1.amazonaws.com) 
+    - run : export AWS_ECR_ACCOUNT="$( aws sts get-caller-identity --output text --query 'Account' )"
+    - run : REGISTRY_URL=${AWS_ECR_ACCOUNT}.dkr.ecr.${AWS_REGION}.amazonaws.com
+    - run : echo $REGISTRY_URL
+    - run : eval $(aws ecr get-login --no-include-email --region $AWS_REGION) #needs AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY envvars!
+    - run : eval $(aws ecr get-login-password --region eu-central-1 | docker login --username AWS --password-stdin 817076261729.dkr.ecr.eu-central-1.amazonaws.com) 
       
-      run : docker build -t $AWS_ECR_ACCOUNT.dkr.ecr.$AWS_REGION.amazonaws.com/$APP_CLIENT:latest ./client
-      run : docker build -t $AWS_ECR_ACCOUNT.dkr.ecr.$AWS_REGION.amazonaws.com/$APP_NGINX:latest ./nginx
-      run : docker build -t $AWS_ECR_ACCOUNT.dkr.ecr.$AWS_REGION.amazonaws.com/$APP_SERVER:latest ./server
-      run : docker build -t $AWS_ECR_ACCOUNT.dkr.ecr.$AWS_REGION.amazonaws.com/$APP_WORKER:latest ./worker
+    - run : docker build -t $AWS_ECR_ACCOUNT.dkr.ecr.$AWS_REGION.amazonaws.com/$APP_CLIENT:latest ./client
+    - run : docker build -t $AWS_ECR_ACCOUNT.dkr.ecr.$AWS_REGION.amazonaws.com/$APP_NGINX:latest ./nginx
+    - run : docker build -t $AWS_ECR_ACCOUNT.dkr.ecr.$AWS_REGION.amazonaws.com/$APP_SERVER:latest ./server
+    - run : docker build -t $AWS_ECR_ACCOUNT.dkr.ecr.$AWS_REGION.amazonaws.com/$APP_WORKER:latest ./worker
 
-      run : docker push $AWS_ECR_ACCOUNT.dkr.ecr.$AWS_REGION.amazonaws.com/$APP_CLIENT:latest
-      run : docker push $AWS_ECR_ACCOUNT.dkr.ecr.$AWS_REGION.amazonaws.com/$APP_NGINX:latest
-      run : docker push $AWS_ECR_ACCOUNT.dkr.ecr.$AWS_REGION.amazonaws.com/$APP_SERVER:latest
-      run : docker push $AWS_ECR_ACCOUNT.dkr.ecr.$AWS_REGION.amazonaws.com/$APP_WORKER:latest
-      run : echo "The  End of push!"
+    - run : docker push $AWS_ECR_ACCOUNT.dkr.ecr.$AWS_REGION.amazonaws.com/$APP_CLIENT:latest
+    - run : docker push $AWS_ECR_ACCOUNT.dkr.ecr.$AWS_REGION.amazonaws.com/$APP_NGINX:latest
+    - run : docker push $AWS_ECR_ACCOUNT.dkr.ecr.$AWS_REGION.amazonaws.com/$APP_SERVER:latest
+    - run : docker push $AWS_ECR_ACCOUNT.dkr.ecr.$AWS_REGION.amazonaws.com/$APP_WORKER:latest
+    - run : echo "The  End of push!"
 
     - name: Generate deployment package
       run: zip -r deploy-multi.zip . -x '*.git*'
